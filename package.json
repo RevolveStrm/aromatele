@@ -1,0 +1,37 @@
+{
+  "name": "aromatele",
+  "version": "1.0.0",
+  "description": "TELEGRAM BOT FOR ACCEPTING ORDERS IN THE CHAIN OF COFFEE SHOPS",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"tsc --watch\" \"nodemon --no-cache --config nodemon.json\"",
+    "biome:format": "npx @biomejs/biome format --write",
+    "biome:lint": "npx @biomejs/biome lint --write",
+    "biome:check": "npx @biomejs/biome check --write"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "clients",
+    "coffee",
+    "orders"
+  ],
+  "author": "Stepan Vladyka",
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^22.10.1",
+    "nodemon": "^3.1.7",
+    "prisma": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "telegraf": "^4.16.3"
+  },
+  "type": "module"
+}
