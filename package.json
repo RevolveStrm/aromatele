@@ -13,13 +13,7 @@
 	"prisma": {
 		"seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
 	},
-	"keywords": [
-		"telegram",
-		"bot",
-		"clients",
-		"coffee",
-		"orders"
-	],
+	"keywords": ["telegram", "bot", "clients", "coffee", "orders"],
 	"author": "Stepan Vladyka",
 	"license": "ISC",
 	"devDependencies": {
