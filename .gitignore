@@ -3,3 +3,8 @@ node_modules
 .env
 
 dist
+
+logs/app.development.log
+logs/error.development.log
+logs/app.log
+logs/error.log

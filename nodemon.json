@@ -1,5 +1,5 @@
 {
-  "watch": ["dist"],
-  "ext": "js",
-  "exec": "node dist/index.js"
+	"watch": ["dist", ".env"],
+	"ext": "js",
+	"exec": "node dist/index.js"
 }
