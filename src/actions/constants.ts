@@ -1,5 +1,9 @@
-import exp from "constants";
-import type { Order, OrderStatus, Product, UserLanguage } from "@prisma/client";
+import {
+	type Order,
+	OrderStatus,
+	type Product,
+	type UserLanguage,
+} from "@prisma/client";
 import { TranslationKeys } from "../dictionary/constants";
 import { dictionaryService } from "../dictionary/dictionary-service";
 
@@ -23,13 +27,16 @@ export enum ACTION_PATH {
 
 export const getCartMessage = (
 	cart: CartItem[],
-	lang: UserLanguage,
+	language: UserLanguage,
 ): string => {
 	if (!cart || !cart.length) {
-		return dictionaryService.getTranslation(TranslationKeys.CART_EMPTY, lang);
+		return dictionaryService.getTranslation(
+			TranslationKeys.CART_EMPTY,
+			language,
+		);
 	}
 
-	let cartMessage = `🛒 ${dictionaryService.getTranslation(TranslationKeys.CART, lang)}:\n\n`;
+	let cartMessage = `🛒 ${dictionaryService.getTranslation(TranslationKeys.YOUR_CART, language)}:\n\n`;
 
 	let totalAmount = 0;
 
@@ -38,29 +45,42 @@ export const getCartMessage = (
 		totalAmount += itemTotal;
 
 		cartMessage += `${index + 1}. ${item.title}\n`;
-		cartMessage += `    └ Вартість: ${item.price.toFixed(2)} грн\n`;
-		cartMessage += `    └ Кількість: ${item.quantity}\n\n`;
+		cartMessage += `   -${dictionaryService.getTranslation(TranslationKeys.PRICE, language)}: ${item.price.toFixed(2)} ₴\n`;
+		cartMessage += `   -${dictionaryService.getTranslation(TranslationKeys.QUANTITY, language)}: ${item.quantity}\n\n`;
 	});
 
-	cartMessage += `Загальна вартість: ${totalAmount.toFixed(2)} грн\n`;
+	cartMessage += `${dictionaryService.getTranslation(TranslationKeys.TOTAL_AMOUNT, language)}: ${totalAmount.toFixed(2)} ₴\n`;
 
 	return cartMessage;
 };
 
-export const getOrdersMessage = (orders: Order[]): string => {
-	let ordersMessage = "Історія ваших замовлень:\n\n";
+export const getOrdersMessage = (
+	orders: Order[],
+	language: UserLanguage,
+): string => {
+	let ordersMessage = `${dictionaryService.getTranslation(TranslationKeys.ORDERS_HISTORY, language)}:\n\n`;
 
 	orders.forEach((order: Order, index) => {
-		ordersMessage += `Номер замовлення: #${order.id}\n`;
-		ordersMessage += `    └ Загальна вартість: ${order.totalAmount} грн\n`;
-		ordersMessage += `    └ Статус: ${getOrderStatus(order.status)}\n`;
-		ordersMessage += `    └ Дата: ${new Date(order.createdAt).toLocaleString("uk-UA")}\n`;
-		ordersMessage += "\n---\n";
+		ordersMessage += `${dictionaryService.getTranslation(TranslationKeys.ORDER_ID, language)}: #${order.id}\n`;
+		ordersMessage += `   - ${dictionaryService.getTranslation(TranslationKeys.TOTAL_AMOUNT, language)}: ${order.totalAmount} грн\n`;
+		ordersMessage += `   - ${dictionaryService.getTranslation(TranslationKeys.ORDER_STATUS, language)}: ${getOrderStatus(order.status, language).toLowerCase()}\n`;
+		ordersMessage += `   - ${dictionaryService.getTranslation(TranslationKeys.ORDER_DATE, language)}: ${new Date(order.createdAt).toLocaleString("uk-UA")}\n`;
+
+		ordersMessage += "\n\n";
 	});
 
 	return ordersMessage;
 };
 
-const getOrderStatus = (status: OrderStatus) => {
-	return status === "CREATED" ? "очікує в закладі" : "в обробці";
+const getOrderStatus = (status: OrderStatus, language: UserLanguage) => {
+	//TODO: fix later
+	return status === OrderStatus.CREATED
+		? dictionaryService.getTranslation(
+				TranslationKeys.WAITING_IN_STORE,
+				language,
+			)
+		: dictionaryService.getTranslation(
+				TranslationKeys.ORDER_PROCESSING,
+				language,
+			);
 };

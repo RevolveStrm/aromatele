@@ -13,6 +13,9 @@ export const envSchema = z.object({
 	NODE_ENV: z.enum(["development", "production"], {
 		message: 'NODE_ENV must be either "development" or "production"',
 	}),
+	ESTABLISHMENT_NAME: z.string({
+		message: "ESTABLISHMENT_NAME must be a valid string",
+	}),
 	ESTABLISHMENT_ADDRESS: z.string({
 		message: "ESTABLISHMENT_ADDRESS must be a valid address string",
 	}),

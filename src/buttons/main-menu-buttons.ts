@@ -31,10 +31,10 @@ export const getMainMenuButtons = (lang: UserLanguage) => [
 			callback_data: ACTION_PATH.VIEW_MAP,
 		},
 	],
-	[
-		{
-			text: dictionaryService.getTranslation(TranslationKeys.SUPPORT, lang),
-			callback_data: ACTION_PATH.VIEW_SUPPORT,
-		},
-	],
+	// [
+	// 	{
+	// 		text: dictionaryService.getTranslation(TranslationKeys.SUPPORT, lang),
+	// 		callback_data: ACTION_PATH.VIEW_SUPPORT,
+	// 	},
+	// ],
 ];

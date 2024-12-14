@@ -18,7 +18,7 @@ export const viewCartAction = async (ctx: Context): Promise<unknown> => {
 
 		const cartMessage = getCartMessage(cart, language);
 
-		const cartButtons = getCartButtons(cart);
+		const cartButtons = getCartButtons(cart, language);
 
 		return ctx.editMessageText(cartMessage, {
 			reply_markup: {

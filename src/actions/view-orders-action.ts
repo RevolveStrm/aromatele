@@ -1,6 +1,8 @@
 import type { Context } from "telegraf";
 import { getBackToMainMenuButton } from "../buttons/back-to-main-menu";
 import { databaseService } from "../database/database-service";
+import { TranslationKeys } from "../dictionary/constants";
+import { dictionaryService } from "../dictionary/dictionary-service";
 import { loggerService } from "../logger/logger-service";
 import { catchActionError } from "../utils/catch-action-error";
 import { getLanguageMetadata } from "../utils/get-language-ctx-metadata";
@@ -19,16 +21,21 @@ export const viewOrdersAction = async (ctx: Context): Promise<unknown> => {
 			},
 		});
 
-		//TODO: Localization
 		if (!orders?.length) {
-			return ctx.editMessageText("Ви ще не зробили жодного замовлення", {
-				reply_markup: {
-					inline_keyboard: [getBackToMainMenuButton(language)],
+			return ctx.editMessageText(
+				dictionaryService.getTranslation(
+					TranslationKeys.NO_ORDERS_MADE,
+					language,
+				),
+				{
+					reply_markup: {
+						inline_keyboard: [getBackToMainMenuButton(language)],
+					},
 				},
-			});
+			);
 		}
 
-		const ordersMessage = getOrdersMessage(orders);
+		const ordersMessage = getOrdersMessage(orders, language);
 
 		return ctx.editMessageText(ordersMessage, {
 			reply_markup: {
@@ -37,9 +44,13 @@ export const viewOrdersAction = async (ctx: Context): Promise<unknown> => {
 		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			loggerService.error(`Error in action []: ${error.message}`);
+			loggerService.error(
+				`Error in action [viewOrdersAction]: ${error.message}`,
+			);
 		} else {
-			loggerService.error("Unknown error occurred in action [].");
+			loggerService.error(
+				"Unknown error occurred in action [viewOrdersAction].",
+			);
 		}
 		catchActionError(ctx);
 	}
