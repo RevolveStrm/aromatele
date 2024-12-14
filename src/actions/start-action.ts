@@ -1,14 +1,21 @@
 import type { Context } from "telegraf";
-import { getMainMenu } from "./constants";
+import { getMainMenuButtons } from "../buttons/main-menu-buttons";
+import { TranslationKeys } from "../dictionary/constants";
+import { dictionaryService } from "../dictionary/dictionary-service";
+import { getLanguageMetadata } from "../utils/get-language-ctx-metadata";
 
 export const startAction = async (ctx: Context) => {
+	const language = getLanguageMetadata(ctx);
+
 	//TODO: Localization
 	await ctx.reply("Ласкаво просимо до Aromatele!");
 
-	//TODO: Localization
-	await ctx.reply("Виберіть одну з опцій:", {
-		reply_markup: {
-			inline_keyboard: getMainMenu("UA"), //TODO:
+	await ctx.reply(
+		dictionaryService.getTranslation(TranslationKeys.CHOOSE_OPTION, language),
+		{
+			reply_markup: {
+				inline_keyboard: getMainMenuButtons(language),
+			},
 		},
-	});
+	);
 };

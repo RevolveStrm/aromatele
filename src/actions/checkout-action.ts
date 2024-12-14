@@ -2,20 +2,30 @@ import type { Context } from "telegraf";
 import { getBackToMainMenuButton } from "../buttons/back-to-main-menu";
 import { cacheService } from "../cache/cache-service";
 import { databaseService } from "../database/database-service";
+import { TranslationKeys } from "../dictionary/constants";
+import { dictionaryService } from "../dictionary/dictionary-service";
 import { loggerService } from "../logger/logger-service";
 import { calcCartTotalAmount } from "../utils/calc-cart-total-amount";
+import { catchActionError } from "../utils/catch-action-error";
 import { getCart } from "../utils/get-cart";
+import { getLanguageMetadata } from "../utils/get-language-ctx-metadata";
 import { getUserMetadata } from "../utils/get-user-ctx-metadata";
 
 export const checkoutAction = async (ctx: Context): Promise<unknown> => {
 	try {
 		const { userId, cartId } = getUserMetadata(ctx);
 
+		const language = getLanguageMetadata(ctx);
+
 		const cart = await getCart(cartId);
 
 		if (!cart || !cart.length) {
-			//TODO: Localization
-			return ctx.reply("Ваш кошик порожній, будь ласка, додайте товари.");
+			return ctx.reply(
+				dictionaryService.getTranslation(
+					TranslationKeys.CART_EMPTY_ADD_ITEMS,
+					language,
+				),
+			);
 		}
 
 		const totalAmount: number = calcCartTotalAmount(cart);
@@ -46,18 +56,20 @@ export const checkoutAction = async (ctx: Context): Promise<unknown> => {
 			});
 		}
 
-		//TODO: Localization
-		return ctx.editMessageText(`Order created with ID: ${createdOrder.id}`, {
-			reply_markup: {
-				inline_keyboard: [getBackToMainMenuButton()],
+		return ctx.editMessageText(
+			`${dictionaryService.getTranslation(TranslationKeys.ORDER_CREATED_WITH_ID, language)}: ${createdOrder.id}`,
+			{
+				reply_markup: {
+					inline_keyboard: [getBackToMainMenuButton(language)],
+				},
 			},
-		});
+		);
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			loggerService.error(`Error in action []: ${error.message}`);
+			loggerService.error(`Error in action [checkoutAction]: ${error.message}`);
 		} else {
-			loggerService.error("Unknown error occurred in action [].");
+			loggerService.error("Unknown error occurred in action [checkoutAction].");
 		}
-		return ctx.reply("An error occurred in action [].");
+		catchActionError(ctx);
 	}
 };

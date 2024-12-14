@@ -1,15 +1,30 @@
-import type { User } from "@prisma/client";
+import type { UserLanguage } from "@prisma/client";
 import type { Context, MiddlewareFn } from "telegraf";
-import { databaseService } from "../database/database-service";
+import { getLanguageButtons } from "../buttons/language-buttons";
 import { loggerService } from "../logger/logger-service";
-import { getUserTelegramMetadata } from "../utils/get-user-telegram-metadata";
+import { catchActionError } from "../utils/catch-action-error";
 
 export const languageMiddleware: MiddlewareFn<Context> = async (
 	ctx: Context,
 	next: () => Promise<void>,
 ): Promise<unknown> => {
 	try {
-		ctx.state.language = "UA" as string;
+		const lang: UserLanguage = ctx.state.user?.language;
+
+		if (!lang) {
+			//@ts-ignore
+			if (ctx.update?.callback_query?.data?.includes("language")) {
+				return next();
+			}
+
+			return ctx.reply("Language? Мова? Langue?", {
+				reply_markup: {
+					inline_keyboard: getLanguageButtons(),
+				},
+			});
+		}
+
+		ctx.state.language = lang as UserLanguage;
 
 		return next();
 	} catch (error: unknown) {
@@ -18,6 +33,6 @@ export const languageMiddleware: MiddlewareFn<Context> = async (
 		} else {
 			loggerService.error("Unknown error occurred in languageMiddleware.");
 		}
-		return ctx.reply("An error occurred while identifying your Telegram ID.");
+		catchActionError(ctx);
 	}
 };

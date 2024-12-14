@@ -2,6 +2,7 @@ import type { User } from "@prisma/client";
 import type { Context, MiddlewareFn } from "telegraf";
 import { databaseService } from "../database/database-service";
 import { loggerService } from "../logger/logger-service";
+import { catchActionError } from "../utils/catch-action-error";
 import { getUserTelegramMetadata } from "../utils/get-user-telegram-metadata";
 
 export const authMiddleware: MiddlewareFn<Context> = async (
@@ -50,6 +51,6 @@ export const authMiddleware: MiddlewareFn<Context> = async (
 		} else {
 			loggerService.error("Unknown error occurred in authMiddleware.");
 		}
-		return ctx.reply("An error occurred while identifying your Telegram ID.");
+		catchActionError(ctx);
 	}
 };

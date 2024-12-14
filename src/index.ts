@@ -2,6 +2,7 @@ import "dotenv/config";
 import { Telegraf } from "telegraf";
 import { checkoutAction } from "./actions/checkout-action";
 import { chooseCategoryAction } from "./actions/choose-category-action";
+import { chooseLanguageAction } from "./actions/choose-language-action";
 import { chooseProductAction } from "./actions/choose-product-action";
 import { clearCartAction } from "./actions/clear-cart-action";
 import { ACTION_PATH } from "./actions/constants";
@@ -11,10 +12,12 @@ import { viewEstablishmentMenuAction } from "./actions/view-establishment-menu-a
 import { viewMainMenuAction } from "./actions/view-main-menu-action";
 import { viewMapAction } from "./actions/view-map-action";
 import { viewOrdersAction } from "./actions/view-orders-action";
+import type { Env } from "./env/env-schema";
 import { environmentService } from "./env/env-service";
 import { loggerService } from "./logger/logger-service";
 import { authMiddleware } from "./middlewares/auth-middleware";
 import { cartMiddleware } from "./middlewares/cart-middleware";
+import { languageMiddleware } from "./middlewares/language-middleware";
 
 loggerService.info("Starting bot. Validating environment values..");
 
@@ -24,7 +27,9 @@ loggerService.info(
 	"Starting bot. Environment values have been successfully validated",
 );
 
-const bot = new Telegraf(environmentService.get("BOT_TOKEN"));
+const bot = new Telegraf(
+	environmentService.get("BOT_TOKEN") as Env["BOT_TOKEN"],
+);
 
 loggerService.info("Telegraf bot started and listening/waiting for updates..");
 
@@ -32,11 +37,15 @@ bot.use(authMiddleware);
 
 bot.use(cartMiddleware);
 
+bot.use(languageMiddleware);
+
 bot.start(startAction);
 
 bot.action(ACTION_PATH.VIEW_ESTABLISHMENT_MENU, viewEstablishmentMenuAction);
 
 bot.action(new RegExp(ACTION_PATH.CHOOSE_CATEGORY), chooseCategoryAction);
+
+bot.action(new RegExp(ACTION_PATH.CHOOSE_LANGUAGE), chooseLanguageAction);
 
 bot.action(new RegExp(ACTION_PATH.CHOOSE_PRODUCT), chooseProductAction);
 

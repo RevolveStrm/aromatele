@@ -1,10 +1,10 @@
 import type { Context } from "telegraf";
 
-export type ProductMetadata = {
+export type ProductQuery = {
 	productId: string;
 };
 
-export const getProductMetadata = (ctx: Context): ProductMetadata => {
+export const getProductQuery = (ctx: Context): ProductQuery => {
 	//@ts-ignore
 	const productId = ctx?.match[1];
 

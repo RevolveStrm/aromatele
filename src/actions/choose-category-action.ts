@@ -1,42 +1,59 @@
 import type { Context } from "telegraf";
 import { databaseService } from "../database/database-service";
+import { TranslationKeys } from "../dictionary/constants";
+import { dictionaryService } from "../dictionary/dictionary-service";
 import { loggerService } from "../logger/logger-service";
-import { getCategoryMetadata } from "../utils/get-category-metadata";
+import { catchActionError } from "../utils/catch-action-error";
+import { getCategoryQuery } from "../utils/get-category-query";
+import { getLanguageMetadata } from "../utils/get-language-ctx-metadata";
 import { ACTION_PATH } from "./constants";
 
 export const chooseCategoryAction = async (ctx: Context): Promise<unknown> => {
 	try {
-		const { categoryId } = getCategoryMetadata(ctx);
+		const { categoryId } = getCategoryQuery(ctx);
+
+		const language = getLanguageMetadata(ctx);
 
 		const category = await databaseService.category.findUnique({
 			where: { id: categoryId },
 			include: { products: true },
 		});
 
-		//TODO: Localization
 		if (!category || category.products.length === 0) {
-			return ctx.reply("У цій категорії поки що немає товарів.");
+			return ctx.reply(
+				dictionaryService.getTranslation(
+					TranslationKeys.NO_ITEMS_IN_CATEGORY,
+					language,
+				),
+			);
 		}
 
-		//TODO: Localization
 		const productMenu = category.products.map((product) => [
 			{
-				text: `${product.title} - ${product.price} грн`,
+				text: `${product.title} - ${product.price} ₴`,
 				callback_data: `product_${product.id}`,
 			},
 		]);
 
-		//TODO: Localization
 		productMenu.push([
 			{
-				text: "⬅️ Назад до категорій",
+				text: `⬅️ ${dictionaryService.getTranslation(TranslationKeys.BACK_TO_CATEGORIES, language)}`,
 				callback_data: ACTION_PATH.VIEW_ESTABLISHMENT_MENU,
 			},
 		]);
 
-		//TODO: Localization
-		return await ctx.editMessageText(
-			`Категорія: ${category.title}\nОберіть товар:`,
+		const categoryTranslation = dictionaryService.getTranslation(
+			TranslationKeys.CATEGORY,
+			language,
+		);
+
+		const selectProductTranslation = dictionaryService.getTranslation(
+			TranslationKeys.SELECT_ITEM,
+			language,
+		);
+
+		return ctx.editMessageText(
+			`${categoryTranslation}: ${category.title}\n${selectProductTranslation}:`,
 			{
 				reply_markup: {
 					inline_keyboard: productMenu,
@@ -46,13 +63,13 @@ export const chooseCategoryAction = async (ctx: Context): Promise<unknown> => {
 	} catch (error: unknown) {
 		if (error instanceof Error) {
 			loggerService.error(
-				`Error in action [CHOOSE_CATEGORY_ACTION]: ${error.message}`,
+				`Error in action [chooseCategoryAction]: ${error.message}`,
 			);
 		} else {
 			loggerService.error(
-				"Unknown error occurred in action [CHOOSE_CATEGORY_ACTION].",
+				"Unknown error occurred in action [chooseCategoryAction].",
 			);
 		}
-		return ctx.reply("An error occurred in action [CHOOSE_CATEGORY_ACTION].");
+		catchActionError(ctx);
 	}
 };

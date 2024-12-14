@@ -1,6 +1,7 @@
 import type { Context, MiddlewareFn } from "telegraf";
 import { cacheService } from "../cache/cache-service";
 import { loggerService } from "../logger/logger-service";
+import { catchActionError } from "../utils/catch-action-error";
 import { getUserMetadata } from "../utils/get-user-ctx-metadata";
 
 export const cartMiddleware: MiddlewareFn<Context> = async (
@@ -9,9 +10,7 @@ export const cartMiddleware: MiddlewareFn<Context> = async (
 ): Promise<unknown> => {
 	try {
 		if (!ctx.state.user) {
-			loggerService.error("User not found in context state.");
-			await ctx.reply("An error occurred. Please try again later.");
-			return;
+			throw new Error("User not found in context state.");
 		}
 
 		const { userId, cartId } = getUserMetadata(ctx);
@@ -42,6 +41,6 @@ export const cartMiddleware: MiddlewareFn<Context> = async (
 		} else {
 			loggerService.error("Unknown error occurred in cartMiddleware.");
 		}
-		return ctx.reply("An error occurred while setting your cart.");
+		catchActionError(ctx);
 	}
 };

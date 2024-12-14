@@ -1,47 +1,65 @@
 import type { Context } from "telegraf";
 import { databaseService } from "../database/database-service";
+import { TranslationKeys } from "../dictionary/constants";
+import { dictionaryService } from "../dictionary/dictionary-service";
 import { loggerService } from "../logger/logger-service";
+import { catchActionError } from "../utils/catch-action-error";
+import { getLanguageMetadata } from "../utils/get-language-ctx-metadata";
 import { ACTION_PATH } from "./constants";
 
 export const viewEstablishmentMenuAction = async (
 	ctx: Context,
 ): Promise<unknown> => {
 	try {
+		const language = getLanguageMetadata(ctx);
+
 		const categories = await databaseService.category.findMany({
 			include: {
 				products: true,
 			},
 		});
 
-		//TODO: Localization
 		if (!categories || categories.length === 0) {
-			return ctx.reply("Наразі немає доступних категорій.");
+			return ctx.reply(
+				dictionaryService.getTranslation(
+					TranslationKeys.NO_CATEGORIES_AVAILABLE,
+					language,
+				),
+			);
 		}
 
 		const categoryMenu = categories.map((category) => [
 			{ text: category.title, callback_data: `category_${category.id}` },
 		]);
 
-		//TODO: Localization
 		categoryMenu.push([
 			{
-				text: "⬅️ Назад до головного меню",
+				text: `⬅️ ${dictionaryService.getTranslation(TranslationKeys.BACK_TO_MENU, language)}`,
 				callback_data: ACTION_PATH.VIEW_MAIN_MENU,
 			},
 		]);
 
-		//TODO: Localization
-		return await ctx.editMessageText("Виберіть категорію:", {
-			reply_markup: {
-				inline_keyboard: categoryMenu,
+		return ctx.editMessageText(
+			dictionaryService.getTranslation(
+				TranslationKeys.SELECT_CATEGORY,
+				language,
+			),
+			{
+				reply_markup: {
+					inline_keyboard: categoryMenu,
+				},
 			},
-		});
+		);
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			loggerService.error(`Error in action [VIEW_PRODUCTS]: ${error.message}`);
+			loggerService.error(
+				`Error in action [viewEstablishmentMenuAction]: ${error.message}`,
+			);
 		} else {
-			loggerService.error("Unknown error occurred in action [VIEW_PRODUCTS].");
+			loggerService.error(
+				"Unknown error occurred in action [viewEstablishmentMenuAction].",
+			);
 		}
-		return ctx.reply("An error occurred in action [VIEW_PRODUCTS].");
+		catchActionError(ctx);
 	}
 };

@@ -3,7 +3,7 @@ import { envSchema } from "./env-schema.js";
 
 class EnvironmentService {
 	private static instance: EnvironmentService;
-	private envConfig: Record<string, string> = {};
+	private envConfig: Record<string, string | number> = {};
 
 	private constructor() {
 		this.validate();
@@ -18,7 +18,7 @@ class EnvironmentService {
 
 	public validate(): void {
 		try {
-			this.envConfig = envSchema.parse(process.env) as Record<string, string>;
+			this.envConfig = envSchema.parse(process.env);
 		} catch (error) {
 			if (error instanceof ZodError) {
 				console.error("Invalid environment variables:", error.format());
@@ -29,7 +29,7 @@ class EnvironmentService {
 		}
 	}
 
-	public get(key: string): string {
+	public get(key: string): string | number {
 		const value = this.envConfig[key];
 		if (!value) {
 			throw new Error(`Environment variable ${key} is not defined`);

@@ -1,36 +1,39 @@
 import type { Context } from "telegraf";
+import { getBackToMainMenuButton } from "../buttons/back-to-main-menu";
 import { cacheService } from "../cache/cache-service";
 import { TranslationKeys } from "../dictionary/constants";
 import { dictionaryService } from "../dictionary/dictionary-service";
 import { loggerService } from "../logger/logger-service";
+import { catchActionError } from "../utils/catch-action-error";
+import { getLanguageMetadata } from "../utils/get-language-ctx-metadata";
 import { getUserMetadata } from "../utils/get-user-ctx-metadata";
-import { ACTION_PATH, type CartItem, getCartMessage } from "./constants";
 
 export const clearCartAction = async (ctx: Context): Promise<unknown> => {
 	try {
 		const { cartId } = getUserMetadata(ctx);
 
+		const language = getLanguageMetadata(ctx);
+
 		await cacheService.set(cartId, JSON.stringify([]), { EX: 3600 }); // TTL 1 HOUR
 
-		//TODO: Localization
-		return await ctx.editMessageText("Кошик був очищений", {
-			reply_markup: {
-				inline_keyboard: [
-					[
-						{
-							text: "⬅️ Назад до меню",
-							callback_data: ACTION_PATH.VIEW_MAIN_MENU,
-						},
-					],
-				],
+		return ctx.editMessageText(
+			dictionaryService.getTranslation(TranslationKeys.CART_CLEARED, language),
+			{
+				reply_markup: {
+					inline_keyboard: [getBackToMainMenuButton(language)],
+				},
 			},
-		});
+		);
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			loggerService.error(`Error in action []: ${error.message}`);
+			loggerService.error(
+				`Error in action [clearCartAction]: ${error.message}`,
+			);
 		} else {
-			loggerService.error("Unknown error occurred in action [].");
+			loggerService.error(
+				"Unknown error occurred in action [clearCartAction].",
+			);
 		}
-		return ctx.reply("An error occurred in action [].");
+		catchActionError(ctx);
 	}
 };

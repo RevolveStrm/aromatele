@@ -1,4 +1,5 @@
-import type { Product } from "@prisma/client";
+import exp from "constants";
+import type { Order, OrderStatus, Product, UserLanguage } from "@prisma/client";
 import { TranslationKeys } from "../dictionary/constants";
 import { dictionaryService } from "../dictionary/dictionary-service";
 
@@ -16,51 +17,19 @@ export enum ACTION_PATH {
 	VIEW_ORDERS = "view_orders",
 	VIEW_SUPPORT = "view_support",
 	CHOOSE_CATEGORY = "category_(.+)",
+	CHOOSE_LANGUAGE = "language_(.+)",
 	CHOOSE_PRODUCT = "product_(.+)",
 }
 
-export const getMainMenu = (lang: "EN" | "UA") => [
-	[
-		{
-			text: dictionaryService.getTranslation(
-				TranslationKeys.ESTABLISHMENT_MENU,
-				lang,
-			),
-			callback_data: ACTION_PATH.VIEW_ESTABLISHMENT_MENU,
-		},
-	],
-	[
-		{
-			text: dictionaryService.getTranslation(TranslationKeys.CART, lang),
-			callback_data: ACTION_PATH.VIEW_CART,
-		},
-	],
-	[
-		{
-			text: dictionaryService.getTranslation(TranslationKeys.ORDERS, lang),
-			callback_data: ACTION_PATH.VIEW_ORDERS,
-		},
-	],
-	[
-		{
-			text: dictionaryService.getTranslation(TranslationKeys.MAP, lang),
-			callback_data: ACTION_PATH.VIEW_MAP,
-		},
-	],
-	[
-		{
-			text: dictionaryService.getTranslation(TranslationKeys.SUPPORT, lang),
-			callback_data: ACTION_PATH.VIEW_SUPPORT,
-		},
-	],
-];
-
-export const getCartMessage = (cart: CartItem[]): string => {
+export const getCartMessage = (
+	cart: CartItem[],
+	lang: UserLanguage,
+): string => {
 	if (!cart || !cart.length) {
-		return dictionaryService.getTranslation(TranslationKeys.CART_EMPTY, "UA");
+		return dictionaryService.getTranslation(TranslationKeys.CART_EMPTY, lang);
 	}
 
-	let cartMessage = "🛒 Ваш кошик:\n\n";
+	let cartMessage = `🛒 ${dictionaryService.getTranslation(TranslationKeys.CART, lang)}:\n\n`;
 
 	let totalAmount = 0;
 
@@ -76,4 +45,22 @@ export const getCartMessage = (cart: CartItem[]): string => {
 	cartMessage += `Загальна вартість: ${totalAmount.toFixed(2)} грн\n`;
 
 	return cartMessage;
+};
+
+export const getOrdersMessage = (orders: Order[]): string => {
+	let ordersMessage = "Історія ваших замовлень:\n\n";
+
+	orders.forEach((order: Order, index) => {
+		ordersMessage += `Номер замовлення: #${order.id}\n`;
+		ordersMessage += `    └ Загальна вартість: ${order.totalAmount} грн\n`;
+		ordersMessage += `    └ Статус: ${getOrderStatus(order.status)}\n`;
+		ordersMessage += `    └ Дата: ${new Date(order.createdAt).toLocaleString("uk-UA")}\n`;
+		ordersMessage += "\n---\n";
+	});
+
+	return ordersMessage;
+};
+
+const getOrderStatus = (status: OrderStatus) => {
+	return status === "CREATED" ? "очікує в закладі" : "в обробці";
 };

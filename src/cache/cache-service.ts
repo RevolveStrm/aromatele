@@ -1,9 +1,10 @@
 import { createClient } from "redis";
+import type { Env } from "../env/env-schema";
 import { environmentService } from "../env/env-service";
 import { loggerService } from "../logger/logger-service";
 
 export const cacheService = createClient({
-	url: environmentService.get("REDIS_URL"),
+	url: environmentService.get("REDIS_URL") as Env["REDIS_URL"],
 });
 
 cacheService.on("error", (err) =>
