@@ -24,11 +24,11 @@ loggerService.info("Starting bot. Validating environment values..");
 environmentService.validate();
 
 loggerService.info(
-	"Starting bot. Environment values have been successfully validated",
+  "Starting bot. Environment values have been successfully validated",
 );
 
 const bot = new Telegraf(
-	environmentService.get("BOT_TOKEN") as Env["BOT_TOKEN"],
+  environmentService.get("BOT_TOKEN") as Env["BOT_TOKEN"],
 );
 
 loggerService.info("Telegraf bot started and listening/waiting for updates..");
@@ -64,17 +64,17 @@ bot.action(ACTION_PATH.VIEW_MAP, viewMapAction);
 bot.launch();
 
 process.once("SIGINT", () => {
-	loggerService.error("SIGINT");
-	bot.stop("SIGINT");
+  loggerService.error("SIGINT");
+  bot.stop("SIGINT");
 });
 process.once("SIGTERM", () => {
-	loggerService.error("SIGTERM");
-	bot.stop("SIGTERM");
+  loggerService.error("SIGTERM");
+  bot.stop("SIGTERM");
 });
 process.on("unhandledRejection", (reason) => {
-	loggerService.error(`Unhandled Rejection: ${reason}`);
+  loggerService.error(`Unhandled Rejection: ${reason}`);
 });
 process.on("uncaughtException", (error) => {
-	loggerService.error(`Uncaught Exception: ${error.message}`);
-	process.exit(1);
+  loggerService.error(`Uncaught Exception: ${error.message}`);
+  process.exit(1);
 });
