@@ -40,7 +40,7 @@ export const checkoutAction = async (ctx: Context): Promise<unknown> => {
     }
 
     return ctx.editMessageText(
-      `${dictionaryService.getTranslation(TranslationKeys.ORDER_CREATED_WITH_ID, language)}: ${createdOrder.id}`,
+      `🎉 ${dictionaryService.getTranslation(TranslationKeys.ORDER_CREATED_WITH_ID, language)} #${createdOrder.id}`,
       {
         reply_markup: {
           inline_keyboard: [getBackToMainMenuButton(language)],
