@@ -2,36 +2,37 @@
   "name": "aromatele",
   "version": "1.0.0",
   "description": "TELEGRAM BOT FOR ACCEPTING ORDERS IN THE CHAIN OF COFFEE SHOPS",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
     "dev": "concurrently \"tsc --watch\" \"nodemon --no-cache --config nodemon.json\"",
     "biome:format": "npx @biomejs/biome format --write",
     "biome:lint": "npx @biomejs/biome lint --write",
     "biome:check": "npx @biomejs/biome check --write"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
-  "keywords": [
-    "telegram",
-    "bot",
-    "clients",
-    "coffee",
-    "orders"
-  ],
+  "keywords": ["telegram", "bot", "clients", "coffee", "orders"],
   "author": "Stepan Vladyka",
   "license": "ISC",
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/node": "^22.10.1",
+    "concurrently": "^9.1.0",
     "nodemon": "^3.1.7",
     "prisma": "^6.0.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "@prisma/client": "^6.0.1",
     "dotenv": "^16.4.7",
-    "telegraf": "^4.16.3"
-  },
-  "type": "module"
+    "redis": "^4.7.0",
+    "telegraf": "^4.16.3",
+    "typegram": "^5.2.0",
+    "winston": "^3.17.0",
+    "zod": "^3.23.8"
+  }
 }
