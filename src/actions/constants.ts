@@ -72,15 +72,24 @@ export const getOrdersMessage = (
   return ordersMessage;
 };
 
-const getOrderStatus = (status: OrderStatus, language: UserLanguage) => {
+const getOrderStatus = (
+  status: OrderStatus,
+  language: UserLanguage,
+): string => {
   //TODO: fix later
-  return status === OrderStatus.CREATED
-    ? dictionaryService.getTranslation(
-        TranslationKeys.WAITING_IN_STORE,
-        language,
-      )
-    : dictionaryService.getTranslation(
-        TranslationKeys.ORDER_PROCESSING,
-        language,
-      );
+  if (status === OrderStatus.PROCESSING) {
+    return dictionaryService.getTranslation(
+      TranslationKeys.WAITING_IN_STORE,
+      language,
+    );
+  }
+
+  if (status === OrderStatus.CREATED) {
+    return dictionaryService.getTranslation(TranslationKeys.NOT_PAID, language);
+  }
+
+  return dictionaryService.getTranslation(
+    TranslationKeys.ORDER_PROCESSING,
+    language,
+  );
 };

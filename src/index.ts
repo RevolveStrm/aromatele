@@ -1,4 +1,7 @@
 import "dotenv/config";
+import path from "node:path";
+import express, { type Handler } from "express";
+import QRCode from "qrcode";
 import { Telegraf } from "telegraf";
 import { checkoutAction } from "./actions/checkout-action";
 import { chooseCategoryAction } from "./actions/choose-category-action";
@@ -18,6 +21,7 @@ import { loggerService } from "./logger/logger-service";
 import { authMiddleware } from "./middlewares/auth-middleware";
 import { cartMiddleware } from "./middlewares/cart-middleware";
 import { languageMiddleware } from "./middlewares/language-middleware";
+import { createWebhookHandler } from "./payment/webhook-handler";
 
 loggerService.info("Starting bot. Validating environment values..");
 
@@ -31,7 +35,26 @@ const bot = new Telegraf(
   environmentService.get("BOT_TOKEN") as Env["BOT_TOKEN"],
 );
 
-loggerService.info("Telegraf bot started and listening/waiting for updates..");
+const server = express();
+
+server.use(express.static(path.join(__dirname, "..", "public")));
+
+const webhookHandler = createWebhookHandler(
+  bot,
+  environmentService.get(
+    "STRIPE_WEBHOOK_SIGNING_SECRET",
+  ) as Env["STRIPE_WEBHOOK_SIGNING_SECRET"],
+) as Handler;
+
+server.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  webhookHandler,
+);
+
+bot.telegram.setMyCommands([
+  { command: ACTION_PATH.VIEW_MAIN_MENU, description: "Головне меню" },
+]);
 
 bot.use(authMiddleware);
 
@@ -51,6 +74,8 @@ bot.action(new RegExp(ACTION_PATH.CHOOSE_PRODUCT), chooseProductAction);
 
 bot.action(ACTION_PATH.VIEW_MAIN_MENU, viewMainMenuAction);
 
+bot.command(ACTION_PATH.VIEW_MAIN_MENU, viewMainMenuAction);
+
 bot.action(ACTION_PATH.VIEW_ORDERS, viewOrdersAction);
 
 bot.action(ACTION_PATH.CLEAR_CART, clearCartAction);
@@ -61,7 +86,17 @@ bot.action(ACTION_PATH.CHECKOUT, checkoutAction);
 
 bot.action(ACTION_PATH.VIEW_MAP, viewMapAction);
 
-bot.launch();
+bot.launch(() =>
+  loggerService.info(
+    "Telegraf bot is started and listening/waiting for updates...",
+  ),
+);
+
+server.listen(environmentService.get("SERVER_PORT") as Env["SERVER_PORT"], () =>
+  loggerService.info(
+    "Webhook server is started and listening/waiting for updates...",
+  ),
+);
 
 process.once("SIGINT", () => {
   loggerService.error("SIGINT");
