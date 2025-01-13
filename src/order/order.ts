@@ -14,12 +14,14 @@ export const createOrderTransaction = async (
   cart: CartItem[],
   totalAmount: number,
   userId: string,
+  paymentId: string,
 ): Promise<Order> => {
   return await databaseService.$transaction(async (prisma) => {
     const order = await prisma.order.create({
       data: {
         userId,
         totalAmount,
+        paymentId,
       },
     });
 

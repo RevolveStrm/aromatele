@@ -3,6 +3,7 @@ import type { UserLanguage } from "@prisma/client";
 export type Translation = Record<UserLanguage, string>;
 
 export enum TranslationKeys {
+  NOT_PAID = "NOT_PAID",
   CAFE_DESCRIPTION = "CAFE_DESCRIPTION",
   ORDER_PROCESSING = "ORDER_PROCESSING",
   WAITING_IN_STORE = "WAITING_IN_STORE",
@@ -423,9 +424,14 @@ export const translations: Record<TranslationKeys, Translation> = {
     FR: "La commande est en cours de traitement",
   },
   WAITING_IN_STORE: {
-    EN: "Waiting in the store",
-    UK: "Очікує в закладі",
-    FR: "En attente dans l'établissement",
+    EN: "Paid. Waiting in the store",
+    UK: "Успішна оплата. Очікує в закладі",
+    FR: "Payé. En attente dans l'établissement",
+  },
+  NOT_PAID: {
+    EN: "Not paid. Please complete the payment.",
+    UK: "Не сплачено. Проведіть оплату, будь ласка.",
+    FR: "Non payé. Veuillez effectuer le paiement.",
   },
   CAFE_DESCRIPTION: {
     EN: "Discover a cozy café where you can indulge in rich, aromatic coffee, savor delightful snacks, and treat yourself to exquisite desserts—all just a few clicks away.",

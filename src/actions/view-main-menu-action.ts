@@ -10,7 +10,7 @@ export const viewMainMenuAction = async (ctx: Context): Promise<unknown> => {
   try {
     const language = getLanguageMetadata(ctx);
 
-    return ctx.editMessageText(
+    return ctx.reply(
       dictionaryService.getTranslation(TranslationKeys.CHOOSE_OPTION, language),
       {
         reply_markup: {
