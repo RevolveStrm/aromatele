@@ -1,5 +1,5 @@
 import { ZodError } from "zod";
-import { envSchema } from "./env-schema.js";
+import { envSchema } from "./env-schema";
 
 class EnvironmentService {
   private static instance: EnvironmentService;
