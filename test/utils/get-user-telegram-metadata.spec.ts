@@ -1,4 +1,7 @@
-import { getUserTelegramMetadata, type UserTelegramMetadata } from "../../src/utils/get-user-telegram-metadata";
+import {
+  getUserTelegramMetadata,
+  type UserTelegramMetadata,
+} from "../../src/utils/get-user-telegram-metadata";
 import type { Context } from "telegraf";
 
 describe("getUserTelegramMetadata", () => {
@@ -39,7 +42,7 @@ describe("getUserTelegramMetadata", () => {
     } as unknown as Context;
 
     expect(() => getUserTelegramMetadata(mockCtx)).toThrow(
-      "Could not extract user telegram metadata from the state"
+      "Could not extract user telegram metadata from the state",
     );
   });
 
@@ -51,7 +54,7 @@ describe("getUserTelegramMetadata", () => {
     } as unknown as Context;
 
     expect(() => getUserTelegramMetadata(mockCtx)).toThrow(
-      "Could not extract user telegram metadata from the state"
+      "Could not extract user telegram metadata from the state",
     );
   });
 });

@@ -1,4 +1,7 @@
-import { getLanguageMetadata, type LanguageMetadata } from "../../src/utils/get-language-ctx-metadata";
+import {
+  getLanguageMetadata,
+  type LanguageMetadata,
+} from "../../src/utils/get-language-ctx-metadata";
 import type { Context } from "telegraf";
 import type { UserLanguage } from "@prisma/client";
 
@@ -21,7 +24,7 @@ describe("getLanguageMetadata", () => {
     } as unknown as Context;
 
     expect(() => getLanguageMetadata(mockCtx)).toThrow(
-      "Could not extract language from the state"
+      "Could not extract language from the state",
     );
   });
 });

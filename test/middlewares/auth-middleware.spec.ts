@@ -21,7 +21,7 @@ describe("authMiddleware", () => {
         message_id: 2,
         date: Math.floor(Date.now() / 1000),
         from: {
-          id: NaN,
+          id: Number.NaN,
           is_bot: false,
           first_name: "Test",
           language_code: "en",

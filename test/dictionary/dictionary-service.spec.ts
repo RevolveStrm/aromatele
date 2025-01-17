@@ -16,16 +16,18 @@ describe("DictionaryService", () => {
     const invalidKey = "INVALID_KEY" as TranslationKeys;
     const language: UserLanguage = "EN";
 
-    expect(() => dictionaryService.getTranslation(invalidKey, language)).toThrow(
-      "Translation not found for key: INVALID_KEY"
-    );
+    expect(() =>
+      dictionaryService.getTranslation(invalidKey, language),
+    ).toThrow("Translation not found for key: INVALID_KEY");
   });
 
   it("should throw an error if a valid key is missing translations for the specified language", () => {
     const key: string = "INVALID_KEY";
     const invalidLanguage = "DE" as UserLanguage;
 
-    expect(() => dictionaryService.getTranslation(key as TranslationKeys, invalidLanguage)).toThrow();
+    expect(() =>
+      dictionaryService.getTranslation(key as TranslationKeys, invalidLanguage),
+    ).toThrow();
   });
 
   it("should handle multi-language translations correctly", () => {
@@ -42,7 +44,7 @@ describe("DictionaryService", () => {
     const language: UserLanguage = "EN";
 
     expect(() => dictionaryService.getTranslation(key, language)).toThrow(
-      `Translation not found for key: ${key}`
+      `Translation not found for key: ${key}`,
     );
   });
 });

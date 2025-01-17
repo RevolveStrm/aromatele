@@ -1,4 +1,7 @@
-import { getCategoryQuery, type CategoryQuery } from "../../src/utils/get-category-query";
+import {
+  getCategoryQuery,
+  type CategoryQuery,
+} from "../../src/utils/get-category-query";
 import type { Context } from "telegraf";
 
 describe("getCategoryQuery", () => {
@@ -18,7 +21,7 @@ describe("getCategoryQuery", () => {
     } as unknown as Context;
 
     expect(() => getCategoryQuery(mockCtx)).toThrow(
-      "Could not extract category id from the query"
+      "Could not extract category id from the query",
     );
   });
 
@@ -26,7 +29,7 @@ describe("getCategoryQuery", () => {
     const mockCtx = null as unknown as Context;
 
     expect(() => getCategoryQuery(mockCtx)).toThrow(
-      "Could not extract category id from the query"
+      "Could not extract category id from the query",
     );
   });
 });
